@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from components.document_data_managment import clean_document, getDataFromDocument
+from components.document_data_management import clean_document, getDataFromDocument
 
 st.title("Formato de documentos")
 
