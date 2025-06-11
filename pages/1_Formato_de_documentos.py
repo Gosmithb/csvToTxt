@@ -19,11 +19,17 @@ def getDataFromDocument(uploaded_file):
 
 @st.cache_data
 def clean_document(document_data, selected_columns):
-
     with st.spinner("Procesando..."):
         if selected_columns:
             # Eliminar duplicados basados en las columnas seleccionadas
-            document_data_cleaned = document_data.drop_duplicates(subset=selected_columns)
+            # Validar que las columnas seleccionadas existen y son strings
+            valid_columns = [col for col in selected_columns if col in document_data.columns and isinstance(col, str)]
+
+            if len(valid_columns) != len(selected_columns):
+                st.error("Algunas columnas seleccionadas no existen o no son válidas. Por favor, verifica tu selección.")
+                return None
+            
+            document_data_cleaned = document_data.drop_duplicates(subset=valid_columns)
 
             st.write("Archivo sin duplicados:")
             st.dataframe(document_data_cleaned)
@@ -38,6 +44,8 @@ def clean_document(document_data, selected_columns):
             # )
 
             st.success("¡Proceso finalizado!")
+            return document_data_cleaned
+        
 
 if uploaded_file is not None:
     document_data = getDataFromDocument(uploaded_file)
@@ -59,6 +67,7 @@ if uploaded_file is not None:
 
     st.write("You selected: ", selected_columns_remove_duplicates)
 
+    # TODO ocultar o bloquear boton despues de primer click para evitar errores o crasheos
     if st.button("Limpiar archivo"):
         if len(selected_columns_remove_duplicates) == 0:
             st.warning("Por favor, selecciona al menos una columna para eliminar duplicados.")
